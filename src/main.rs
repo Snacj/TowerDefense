@@ -2,25 +2,33 @@ extern crate sdl2;
 
 use sdl2::pixels::Color;
 use sdl2::event::Event;
+use sdl2::image::LoadTexture;
+use sdl2::rect::Rect;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
-pub fn main() {
+pub fn main() -> Result<(), String> {
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
-    let window = video_subsystem.window("rust-sdl2 demo", 800, 600)
+    let window = video_subsystem.window("Tower Defense", 800, 600)
         .position_centered()
         .build()
         .unwrap();
 
     let mut canvas = window.into_canvas().build().unwrap();
 
+    let texture_creator = canvas.texture_creator();
+    let texture = texture_creator.load_texture("assets/sprites/test.png")?;
+
+    let dest_rect = Rect::new(100, 100, 64, 64);
+
     canvas.set_draw_color(Color::RGB(0, 255, 255));
     canvas.clear();
     canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
     let mut i = 0;
+
     'running: loop {
         i = (i + 1) % 255;
         canvas.set_draw_color(Color::RGB(i, 64, 255 - i));
@@ -35,8 +43,10 @@ pub fn main() {
             }
         }
         // The rest of the game loop goes here...
+        canvas.copy(&texture, None, Some(dest_rect)).unwrap();
 
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
+    Ok(())
 }
