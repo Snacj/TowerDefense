@@ -1,6 +1,5 @@
 extern crate sdl2;
 
-use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::image::LoadTexture;
 use sdl2::rect::Rect;
@@ -21,20 +20,17 @@ pub fn main() -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
     let tower = texture_creator.load_texture("assets/sprites/test.png")?;
     let man = texture_creator.load_texture("assets/sprites/man.png")?;
+    let background = texture_creator.load_texture("assets/sprites/background.png")?;
 
-    let tower1_dest_rect = Rect::new(100, 100, 64, 64);
+    let tower1_dest_rect = Rect::new(50, 100, 64, 64);
     let mut man_dest_rect = Rect::new(300, 200, 64, 64);
 
-    canvas.set_draw_color(Color::RGB(0, 255, 255));
+    canvas.copy(&background, None, None).expect("Failed to copy tower texture");
     canvas.clear();
     canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
-    let mut i = 0;
 
     'running: loop {
-        i = (i + 1) % 255;
-        canvas.set_draw_color(Color::RGB(i, 64, 255 - i));
-        canvas.clear();
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit {..} |
@@ -61,8 +57,9 @@ pub fn main() -> Result<(), String> {
         }
 
         // The rest of the game loop goes here...
-        canvas.copy(&tower, None, Some(tower1_dest_rect)).unwrap();
-        canvas.copy(&man, None, Some(man_dest_rect)).unwrap();
+        canvas.copy(&background, None, None).expect("Failed to copy tower texture");
+        canvas.copy(&tower, None, Some(tower1_dest_rect)).expect("Failed to copy tower texture");
+        canvas.copy(&man, None, Some(man_dest_rect)).expect("Failed to copy man texture");
 
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
