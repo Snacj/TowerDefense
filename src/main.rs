@@ -19,9 +19,11 @@ pub fn main() -> Result<(), String> {
     let mut canvas = window.into_canvas().build().unwrap();
 
     let texture_creator = canvas.texture_creator();
-    let texture = texture_creator.load_texture("assets/sprites/test.png")?;
+    let tower = texture_creator.load_texture("assets/sprites/test.png")?;
+    let man = texture_creator.load_texture("assets/sprites/man.png")?;
 
-    let dest_rect = Rect::new(100, 100, 64, 64);
+    let tower1_dest_rect = Rect::new(100, 100, 64, 64);
+    let mut man_dest_rect = Rect::new(300, 200, 64, 64);
 
     canvas.set_draw_color(Color::RGB(0, 255, 255));
     canvas.clear();
@@ -42,8 +44,25 @@ pub fn main() -> Result<(), String> {
                 _ => {}
             }
         }
+
+        let keyboard_state = event_pump.keyboard_state();
+
+        if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::W) {
+            man_dest_rect.set_y(man_dest_rect.y() - 5);
+        }
+        if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::S) {
+            man_dest_rect.set_y(man_dest_rect.y() + 5);
+        }
+        if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::A) {
+            man_dest_rect.set_x(man_dest_rect.x() - 5);
+        }
+        if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::D) {
+            man_dest_rect.set_x(man_dest_rect.x() + 5);
+        }
+
         // The rest of the game loop goes here...
-        canvas.copy(&texture, None, Some(dest_rect)).unwrap();
+        canvas.copy(&tower, None, Some(tower1_dest_rect)).unwrap();
+        canvas.copy(&man, None, Some(man_dest_rect)).unwrap();
 
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
