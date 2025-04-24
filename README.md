@@ -75,8 +75,8 @@ assets/
 
 ## 🎨 Assets
 
-- **Sprites**: Placeholder pixel art from [Kenney.nl](https://kenney.nl/assets) or custom
-- **Audio**: Chiptune background music and effects (public domain or CC0)
+- **Sprites**: Placeholder pixel art from [craftpix.net](https://craftpix.net/) [itch.io](https://itch.io/)  or custom
+- **Audio**: TBC
 
 ---
 
