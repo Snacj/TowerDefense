@@ -26,7 +26,7 @@ _A 2D pixel-art tower defense game built with Rust and SDL2._
 ### Clone and Run
 
 ```bash
-git clone https://github.com/yourusername/rusty-defense.git
+git clone https://github.com/Snacj/rusty-defense.git
 cd rusty-defense
 cargo run
 ```
