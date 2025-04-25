@@ -1,12 +1,15 @@
 extern crate sdl2;
 mod assets;
 mod enemy;
+mod tower;
 
 use assets::Assets;
 use enemy::Enemy;
+use tower::Tower;
 
 use sdl2::event::Event;
 use sdl2::rect::Rect;
+use sdl2::mouse::MouseButton;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
@@ -58,6 +61,7 @@ pub fn main() -> Result<(), String> {
     let mut event_pump = sdl_context.event_pump().unwrap();
 
     let mut enemy = Enemy::create_enemy();
+    let mut tower_positions: Vec<Rect> = Vec::new();
 
     // Main game loop
     'running: loop {
@@ -67,6 +71,10 @@ pub fn main() -> Result<(), String> {
                 Event::Quit {..} |
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     break 'running
+                },
+                Event::MouseButtonDown { x, y, mouse_btn: MouseButton::Left, .. } => {
+                    tower_positions.push(Rect::new(x - 32, y - 32, 64, 64));
+                    println!("Tower placed at ({}, {})", x, y);
                 },
                 _ => {}
             }
@@ -113,8 +121,12 @@ pub fn main() -> Result<(), String> {
         canvas.copy(&assets.tower, None, Some(tower1_dest_rect)).expect("Failed to copy tower texture");
         canvas.copy(&assets.man, None, Some(man_dest_rect)).expect("Failed to copy man texture");
         if !enemy.finished {
-            canvas.copy(&assets.enemy, None, Some(enemy_dest_rect))?;
-        }        
+            canvas.copy(&assets.enemy, None, Some(enemy_dest_rect)).expect("Failed to copy enemy texture");
+        }
+
+        for tower in &tower_positions {
+            canvas.copy(&assets.tower, None, Some(*tower)).expect("Failed to copy tower texture");
+        }
 
         // Update the canvas
         canvas.present();
