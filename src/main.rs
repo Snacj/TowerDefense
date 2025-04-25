@@ -1,7 +1,9 @@
 extern crate sdl2;
+mod assets;
+
+use assets::Assets;
 
 use sdl2::event::Event;
-use sdl2::image::LoadTexture;
 use sdl2::rect::Rect;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
@@ -36,10 +38,7 @@ pub fn main() -> Result<(), String> {
     let texture_creator = canvas.texture_creator();
 
     // Load textures
-    let tower = texture_creator.load_texture("assets/sprites/test.png")?;
-    let man = texture_creator.load_texture("assets/sprites/man.png")?;
-    let fluss = texture_creator.load_texture("assets/sprites/fluss2.png")?;
-    let grass = texture_creator.load_texture("assets/sprites/grass.png")?;
+    let assets = Assets::load(&texture_creator).unwrap();
 
     // Set destination rectangles for the textures to set size and position
     let tower1_dest_rect = Rect::new(100, 130, 64, 64);
@@ -93,13 +92,13 @@ pub fn main() -> Result<(), String> {
         for i in 0..COLS {
             for j in 0..ROWS {
                 let dest_rect = Rect::new((i * SPRITE_SIZE) as i32, (j * SPRITE_SIZE) as i32, SPRITE_SIZE, SPRITE_SIZE);
-                canvas.copy(&grass, None, Some(dest_rect)).expect("Failed to copy grass texture");
+                canvas.copy(&assets.grass, None, Some(dest_rect)).expect("Failed to copy grass texture");
             }
         }
         // Render rest of the textures in Order
-        canvas.copy(&fluss, None, Some(fluss_dest_rect)).expect("Failed to copy tower texture");
-        canvas.copy(&tower, None, Some(tower1_dest_rect)).expect("Failed to copy tower texture");
-        canvas.copy(&man, None, Some(man_dest_rect)).expect("Failed to copy man texture");
+        canvas.copy(&assets.fluss, None, Some(fluss_dest_rect)).expect("Failed to copy tower texture");
+        canvas.copy(&assets.tower, None, Some(tower1_dest_rect)).expect("Failed to copy tower texture");
+        canvas.copy(&assets.man, None, Some(man_dest_rect)).expect("Failed to copy man texture");
 
         // Update the canvas
         canvas.present();
