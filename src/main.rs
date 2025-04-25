@@ -41,7 +41,7 @@ pub fn main() -> Result<(), String> {
     let assets = Assets::load(&texture_creator).unwrap();
 
     // Set destination rectangles for the textures to set size and position
-    let tower1_dest_rect = Rect::new(100, 130, 64, 64);
+    let tower1_dest_rect = Rect::new(64, 10, 64, 64);
     let mut man_dest_rect = Rect::new(300, 200, 64, 64);
     let fluss_dest_rect = Rect::new(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -73,19 +73,19 @@ pub fn main() -> Result<(), String> {
         // downwards
         // W = Up
         if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::W) {
-            man_dest_rect.set_y(man_dest_rect.y() - 5);
+            man_dest_rect.set_y(man_dest_rect.y() - 2);
         }
         // S = Down
         if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::S) {
-            man_dest_rect.set_y(man_dest_rect.y() + 5);
+            man_dest_rect.set_y(man_dest_rect.y() + 2);
         }
         // A = Left
         if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::A) {
-            man_dest_rect.set_x(man_dest_rect.x() - 5);
+            man_dest_rect.set_x(man_dest_rect.x() - 2);
         }
         // D = Right
         if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::D) {
-            man_dest_rect.set_x(man_dest_rect.x() + 5);
+            man_dest_rect.set_x(man_dest_rect.x() + 2);
         }
 
         // Render grass tiles on every Row Col
