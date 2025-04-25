@@ -1,58 +1,15 @@
 extern crate sdl2;
 mod assets;
+mod enemy;
 
 use assets::Assets;
+use enemy::Enemy;
 
 use sdl2::event::Event;
 use sdl2::rect::Rect;
 use sdl2::keyboard::Keycode;
 use std::time::Duration;
 
-#[derive(Debug)]
-struct Enemy {
-    position: (f32, f32),
-    speed: f32,
-    health: i32,
-    path: Vec<(f32, f32)>,
-    current_target: usize,
-    finished: bool,
-}
-
-impl Enemy {
-    fn new(path: Vec<(f32, f32)>) -> Self {
-        Self {
-            position: path[0],
-            speed: 5.0,
-            health: 100,
-            path,
-            current_target: 1,
-            finished: false,
-        }
-    }
-
-    fn update(&mut self) {
-        if self.finished || self.current_target >= self.path.len() {
-            self.finished = true;
-            return;
-        }
-
-        let (tx, ty) = self.path[self.current_target]; // Target
-        let (x, y) = self.position;
-        let dx = tx - x;
-        let dy = ty - y;
-        let dist = (dx * dx + dy * dy).sqrt(); // Distance to Target
-
-        if dist < self.speed {
-            // When close enough, jump on Target and use new Target
-            self.position = (tx, ty);
-            self.current_target += 1;
-        } else {
-            // Move towards Target
-            self.position.0 += self.speed * dx / dist;
-            self.position.1 += self.speed * dy / dist;
-        }
-    }
-}
 
 
 pub fn main() -> Result<(), String> {
