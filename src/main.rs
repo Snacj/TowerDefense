@@ -14,15 +14,15 @@ pub fn main() -> Result<(), String> {
     const COLS: u32 = 16;
 
     const TILE_SIZE: u32 = 16;
-    const SPRITE_SIZE: u32 = TILE_SIZE * 3;
+    const SPRITE_SIZE: u32 = TILE_SIZE * 4;
 
-    const WINDOW_WIDTH: u32 = SPRITE_SIZE * ROWS;
-    const WINDOW_HEIGHT: u32 = SPRITE_SIZE * COLS;
+    const WINDOW_WIDTH: u32 = SPRITE_SIZE * COLS;
+    const WINDOW_HEIGHT: u32 = SPRITE_SIZE * ROWS;
 
     // print the window size
     println!("Window size: {} x {}", WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    let window = video_subsystem.window("Tower Defense", WINDOW_HEIGHT, WINDOW_WIDTH)
+    let window = video_subsystem.window("Tower Defense", WINDOW_WIDTH, WINDOW_HEIGHT)
         .position_centered()
         .build()
         .unwrap();
@@ -37,7 +37,7 @@ pub fn main() -> Result<(), String> {
 
     let tower1_dest_rect = Rect::new(10, 100, 64, 64);
     let mut man_dest_rect = Rect::new(300, 200, 64, 64);
-    let fluss_dest_rect = Rect::new(0, 0, WINDOW_WIDTH * 2, WINDOW_HEIGHT);
+    let fluss_dest_rect = Rect::new(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     canvas.clear();
     canvas.present();
@@ -72,7 +72,7 @@ pub fn main() -> Result<(), String> {
         // The rest of the game loop goes here...
         for i in 0..COLS {
             for j in 0..ROWS {
-                let dest_rect = Rect::new((i * 16 * 3) as i32, (j * 16 * 3) as i32, 16*3, 16*3);
+                let dest_rect = Rect::new((i * SPRITE_SIZE) as i32, (j * SPRITE_SIZE) as i32, SPRITE_SIZE, SPRITE_SIZE);
                 canvas.copy(&grass, None, Some(dest_rect)).expect("Failed to copy grass texture");
             }
         }
