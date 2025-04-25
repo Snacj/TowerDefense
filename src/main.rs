@@ -57,21 +57,7 @@ pub fn main() -> Result<(), String> {
     // Create event pump to handle events 
     let mut event_pump = sdl_context.event_pump().unwrap();
 
-    // Waypoint List
-    let enemy_path = vec![
-    (64.0, 10.0),
-    (128.0, 200.0),
-    (200.0, 350.0),
-    (650.0, 350.0),
-    (850.0, 350.0),
-    (850.0, 128.0),
-    (640.0, 128.0),
-    (640.0, 350.0),
-    (800.0, 630.0),
-    (960.0, 630.0),
-    ];
-
-    let mut enemy = Enemy::new(enemy_path);
+    let mut enemy = Enemy::create_enemy();
 
     // Main game loop
     'running: loop {
