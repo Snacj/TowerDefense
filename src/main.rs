@@ -61,10 +61,9 @@ pub fn main() -> Result<(), String> {
     // Button size
     let button_width = 64 * 4;
     let button_height = 32 * 4;
-    let button_spacing = 20; // 20px space between buttons
 
     // Total height of the two buttons plus spacing
-    let total_buttons_height = button_height * 2 + button_spacing;
+    let total_buttons_height = button_height * 2;
 
     // X is centered based on button width
     let button_x = (WINDOW_WIDTH as i32 / 2 - button_width / 2) as i32;
@@ -73,7 +72,7 @@ pub fn main() -> Result<(), String> {
 
     // Create buttons
     let button1 = ui::Button::new(button_x, button_y, button_width as u32, button_height as u32, &assets.start_button, "Button 1");
-    let button2 = ui::Button::new(button_x, button_y + button_height + button_spacing, button_width as u32, button_height as u32, &assets.close_button, "Button 2");
+    let button2 = ui::Button::new(button_x, button_y + button_height, button_width as u32, button_height as u32, &assets.close_button, "Button 2");
 
 
     // Clear the canvas and update new renders
@@ -103,7 +102,9 @@ pub fn main() -> Result<(), String> {
         // Handle events
         for event in event_pump.poll_iter() {
             match event {
-                Event::Quit {..} |
+                Event::Quit {..} => {
+                    break 'running;
+                },
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     game_state = 0;
                 },
