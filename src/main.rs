@@ -9,7 +9,6 @@ use enemy::Enemy;
 use sdl2::image::LoadSurface;
 use sdl2::pixels::PixelFormatEnum;
 use sdl2::surface::Surface;
-use tower::Tower;
 
 use sdl2::event::Event;
 use sdl2::rect::Rect;
@@ -59,8 +58,23 @@ pub fn main() -> Result<(), String> {
     let background_dest_rect = Rect::new(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     // define buttons
-    let button1 = ui::Button::new(10, 10, 64*4, 32*4,  &assets.start_button, "Button 1");
-    let button2 = ui::Button::new(10 + 64*4, 10, 64*4, 32*4,  &assets.close_button, "Button 2");
+    // Button size
+    let button_width = 64 * 4;
+    let button_height = 32 * 4;
+    let button_spacing = 20; // 20px space between buttons
+
+    // Total height of the two buttons plus spacing
+    let total_buttons_height = button_height * 2 + button_spacing;
+
+    // X is centered based on button width
+    let button_x = (WINDOW_WIDTH as i32 / 2 - button_width / 2) as i32;
+    // Y is centered based on total height
+    let button_y = (WINDOW_HEIGHT as i32 / 2 - total_buttons_height / 2) as i32;
+
+    // Create buttons
+    let button1 = ui::Button::new(button_x, button_y, button_width as u32, button_height as u32, &assets.start_button, "Button 1");
+    let button2 = ui::Button::new(button_x, button_y + button_height + button_spacing, button_width as u32, button_height as u32, &assets.close_button, "Button 2");
+
 
     // Clear the canvas and update new renders
     canvas.clear();
@@ -70,10 +84,17 @@ pub fn main() -> Result<(), String> {
     let mut event_pump = sdl_context.event_pump().unwrap();
 
     // game state
+    // 0 = Menu
+    // 1 = Game
     let mut game_state = 0;
+    // creating Enemy
     let mut enemy = Enemy::create_enemy();
+
+    // List of tower positions
     let mut tower_positions: Vec<Rect> = Vec::new();
 
+    // Load the path as surface to check for collision
+    // Converting to RGBA to check for transparency
     let mut path_surface = Surface::from_file("assets/sprites/fluss2.png")?;
     path_surface = path_surface.convert_format(PixelFormatEnum::RGBA8888)?;
 
@@ -92,6 +113,8 @@ pub fn main() -> Result<(), String> {
                     if game_state == 0 {
                         // DEBUG
                         println!("mouse btn down at ({},{})", x, y);
+
+                        // Check if the mouse is over the button
                         if button1.is_hovered(x, y) {
                             println!("Button 1 clicked");
                             game_state = 1;
@@ -136,6 +159,8 @@ pub fn main() -> Result<(), String> {
             man_dest_rect.set_x(man_dest_rect.x() + 2);
         }
 
+        // Render depending on the game state
+        // Game State 1 = Game
         if game_state == 1 {
             if !enemy.finished {
                 enemy.update();
@@ -166,17 +191,19 @@ pub fn main() -> Result<(), String> {
             for tower in &tower_positions {
                 canvas.copy(&assets.tower, None, Some(*tower)).expect("Failed to copy tower texture");
             }
-            } else {
-                canvas.copy(&assets.start_screen, None, Some(background_dest_rect)).expect("Failed to copy tower texture");
-                button1.draw(&mut canvas);
-                button2.draw(&mut canvas);
-            }
 
-            // Update the canvas
-            canvas.present();
+        // Game State 0 = Menu
+        } else {
+            canvas.copy(&assets.start_screen, None, Some(background_dest_rect)).expect("Failed to copy tower texture");
+            button1.draw(&mut canvas);
+            button2.draw(&mut canvas);
+        }
 
-            // Delay to set the Framerate
-            ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60)); // 60 FPS
+        // Update the canvas
+        canvas.present();
+
+        // Delay to set the Framerate
+        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60)); // 60 FPS
     }
     Ok(())
 }
@@ -187,8 +214,8 @@ fn can_place_tower(surface: &Surface, x: i32, y: i32) -> bool {
 
     for dx in (0..tower_size).step_by(step) {
         for dy in (0..tower_size).step_by(step) {
-            let check_x = (x + dx - tower_size / 2);
-            let check_y = (y + dy - tower_size / 2);
+            let check_x = x + dx - tower_size / 2;
+            let check_y = y + dy - tower_size / 2;
 
             if check_x < 0 || check_y < 0 {
                 continue;
