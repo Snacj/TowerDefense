@@ -5,6 +5,9 @@ mod tower;
 
 use assets::Assets;
 use enemy::Enemy;
+use sdl2::image::LoadSurface;
+use sdl2::pixels::PixelFormatEnum;
+use sdl2::surface::Surface;
 use tower::Tower;
 
 use sdl2::event::Event;
@@ -63,6 +66,9 @@ pub fn main() -> Result<(), String> {
     let mut enemy = Enemy::create_enemy();
     let mut tower_positions: Vec<Rect> = Vec::new();
 
+    let mut path_surface = Surface::from_file("assets/sprites/fluss2.png")?;
+    path_surface = path_surface.convert_format(PixelFormatEnum::RGBA8888)?;
+
     // Main game loop
     'running: loop {
         // Handle events
@@ -73,8 +79,12 @@ pub fn main() -> Result<(), String> {
                     break 'running
                 },
                 Event::MouseButtonDown { x, y, mouse_btn: MouseButton::Left, .. } => {
-                    tower_positions.push(Rect::new(x - 32, y - 32, 64, 64));
-                    println!("Tower placed at ({}, {})", x, y);
+                    if can_place_tower(&path_surface, x, y) {
+                        tower_positions.push(Rect::new(x - 32, y - 32, 64, 64));
+                        println!("Tower placed at ({}, {})", x, y);
+                    } else {
+                        print!("Cannot place tower on path");
+                    }
                 },
                 _ => {}
             }
@@ -135,4 +145,46 @@ pub fn main() -> Result<(), String> {
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60)); // 60 FPS
     }
     Ok(())
+}
+
+fn can_place_tower(surface: &Surface, x: i32, y: i32) -> bool {
+    let tower_size = 64;
+    let step = 8; // Check every 8 pixels to speed up, instead of every pixel
+
+    for dx in (0..tower_size).step_by(step) {
+        for dy in (0..tower_size).step_by(step) {
+            let check_x = (x + dx - tower_size / 2);
+            let check_y = (y + dy - tower_size / 2);
+
+            if check_x < 0 || check_y < 0 {
+                continue;
+            }
+
+            if is_occupied(surface, check_x as u32, check_y as u32) {
+                return false;
+            }
+        }
+    }
+
+    true
+}
+
+
+fn is_occupied(surface: &Surface, xx: u32, yy: u32) -> bool {
+    let x = xx / 4;
+    let y = yy / 4;
+    if x >= surface.width() || y >= surface.height() {
+        return false; // click outside of surface
+    }
+
+    let pitch = surface.pitch() as usize;
+    let bpp = surface.pixel_format_enum().byte_size_per_pixel();
+    let surface_data = surface.without_lock().expect("Surface must not be locked");
+
+    let index = (y as usize * pitch) + (x as usize * bpp);
+
+    // Assume RGBA8888 format (little-endian: R G B A order)
+    let a = surface_data[index + 3];
+
+    a > 20 // threshold to avoid semi-transparent noise
 }
