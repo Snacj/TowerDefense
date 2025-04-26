@@ -56,10 +56,11 @@ pub fn main() -> Result<(), String> {
     let mut man_dest_rect = Rect::new(300, 200, 64, 64);
     let fluss_dest_rect = Rect::new(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
     let mut enemy_dest_rect = Rect::new(64, 10, 64, 64);
+    let background_dest_rect = Rect::new(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     // define buttons
-    let button1 = ui::Button::new(10, 10, 100, 50, sdl2::pixels::Color::RGB(0, 255, 0), "Button 1");
-    let button2 = ui::Button::new(120, 10, 100, 50, sdl2::pixels::Color::RGB(255, 0, 0), "Button 2");
+    let button1 = ui::Button::new(10, 10, 64*4, 32*4,  &assets.start_button, "Button 1");
+    let button2 = ui::Button::new(10 + 64*4, 10, 64*4, 32*4,  &assets.close_button, "Button 2");
 
     // Clear the canvas and update new renders
     canvas.clear();
@@ -83,13 +84,13 @@ pub fn main() -> Result<(), String> {
             match event {
                 Event::Quit {..} |
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                    
-                    break 'running
+                    game_state = 0;
                 },
 
                 // Track mouse coordinates on click
                 Event::MouseButtonDown { x, y, mouse_btn: MouseButton::Left, .. } => {
                     if game_state == 0 {
+                        // DEBUG
                         println!("mouse btn down at ({},{})", x, y);
                         if button1.is_hovered(x, y) {
                             println!("Button 1 clicked");
@@ -166,6 +167,7 @@ pub fn main() -> Result<(), String> {
                 canvas.copy(&assets.tower, None, Some(*tower)).expect("Failed to copy tower texture");
             }
             } else {
+                canvas.copy(&assets.start_screen, None, Some(background_dest_rect)).expect("Failed to copy tower texture");
                 button1.draw(&mut canvas);
                 button2.draw(&mut canvas);
             }

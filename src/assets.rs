@@ -8,6 +8,9 @@ pub struct Assets<'a> {
     pub fluss: Texture<'a>,
     pub grass: Texture<'a>,
     pub enemy: Texture<'a>,
+    pub start_button: Texture<'a>,
+    pub close_button: Texture<'a>,
+    pub start_screen: Texture<'a>,
 }
 
 impl<'a> Assets<'a> {
@@ -17,6 +20,9 @@ impl<'a> Assets<'a> {
         let fluss = texture_creator.load_texture("assets/sprites/fluss2.png")?;
         let grass = texture_creator.load_texture("assets/sprites/grass.png")?;
         let enemy = texture_creator.load_texture("assets/sprites/enemy.png")?;
+        let start_button = texture_creator.load_texture("assets/sprites/start_game_button.png")?;
+        let close_button = texture_creator.load_texture("assets/sprites/close_game_button.png")?;
+        let start_screen = texture_creator.load_texture("assets/sprites/start_screen.png")?;
 
         Ok(Self {
             tower,
@@ -24,6 +30,9 @@ impl<'a> Assets<'a> {
             fluss,
             grass,
             enemy,
+            start_button,
+            close_button,
+            start_screen,
         })
     }
 }
