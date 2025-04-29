@@ -71,8 +71,8 @@ pub fn main() -> Result<(), String> {
     let button_y = (WINDOW_HEIGHT as i32 / 2 - total_buttons_height / 2) as i32;
 
     // Create buttons
-    let button1 = ui::Button::new(button_x, button_y, button_width as u32, button_height as u32, &assets.start_button, "Button 1");
-    let button2 = ui::Button::new(button_x, button_y + button_height, button_width as u32, button_height as u32, &assets.close_button, "Button 2");
+    let start_game_button = ui::Button::new("start_game", button_x, button_y, button_width as u32, button_height as u32, &assets.start_button);
+    let close_game_button = ui::Button::new("close_game", button_x, button_y + button_height, button_width as u32, button_height as u32, &assets.close_button);
 
 
     // Clear the canvas and update new renders
@@ -85,12 +85,22 @@ pub fn main() -> Result<(), String> {
     // game state
     // 0 = Menu
     // 1 = Game
-    let mut game_state = 0;
+    pub struct GamePanel {
+        pub game_state: u32,
+        pub tower_positions: Vec<Rect>, 
+    }
+
+    let mut game_panel = GamePanel {
+        game_state: 0,
+        tower_positions: Vec::new(),
+    };
+
+    game_panel.game_state = 0;
     // creating Enemy
     let mut enemy = Enemy::create_enemy();
 
     // List of tower positions
-    let mut tower_positions: Vec<Rect> = Vec::new();
+    game_panel.tower_positions = Vec::new();
 
     // Load the path as surface to check for collision
     // Converting to RGBA to check for transparency
@@ -106,26 +116,26 @@ pub fn main() -> Result<(), String> {
                     break 'running;
                 },
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                    game_state = 0;
+                    game_panel.game_state = 0;
                 },
 
                 // Track mouse coordinates on click
                 Event::MouseButtonDown { x, y, mouse_btn: MouseButton::Left, .. } => {
-                    if game_state == 0 {
+                    if game_panel.game_state == 0 {
                         // DEBUG
                         println!("mouse btn down at ({},{})", x, y);
 
                         // Check if the mouse is over the button
-                        if button1.is_hovered(x, y) {
+                        if start_game_button.is_hovered(x, y) {
                             println!("Button 1 clicked");
-                            game_state = 1;
-                        } else if button2.is_hovered(x, y) {
+                            game_panel.game_state = 1;
+                        } else if close_game_button.is_hovered(x, y) {
                             println!("Button 2 clicked");
                             break 'running;
                         }
                     } else {
                         if can_place_tower(&path_surface, x, y) {
-                            tower_positions.push(Rect::new(x - 32, y - 32, 64, 64));
+                            game_panel.tower_positions.push(Rect::new(x - 32, y - 32, 64, 64));
                             println!("Tower placed at ({}, {})", x, y);
                         } else {
                             print!("Cannot place tower on path");
@@ -145,7 +155,7 @@ pub fn main() -> Result<(), String> {
         // W = Up
         if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::W) {
             man_dest_rect.set_y(man_dest_rect.y() - 2);
-            game_state = 1;
+            game_panel.game_state = 1;
         }
         // S = Down
         if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::S) {
@@ -162,7 +172,7 @@ pub fn main() -> Result<(), String> {
 
         // Render depending on the game state
         // Game State 1 = Game
-        if game_state == 1 {
+        if game_panel.game_state == 1 {
             if !enemy.finished {
                 enemy.update();
                 enemy_dest_rect.set_x(enemy.position.0 as i32);
@@ -189,15 +199,15 @@ pub fn main() -> Result<(), String> {
                 canvas.copy(&assets.enemy, None, Some(enemy_dest_rect)).expect("Failed to copy enemy texture");
             }
 
-            for tower in &tower_positions {
+            for tower in &game_panel.tower_positions {
                 canvas.copy(&assets.tower, None, Some(*tower)).expect("Failed to copy tower texture");
             }
 
         // Game State 0 = Menu
         } else {
             canvas.copy(&assets.start_screen, None, Some(background_dest_rect)).expect("Failed to copy tower texture");
-            button1.draw(&mut canvas);
-            button2.draw(&mut canvas);
+            start_game_button.draw(&mut canvas);
+            close_game_button.draw(&mut canvas);
         }
 
         // Update the canvas
