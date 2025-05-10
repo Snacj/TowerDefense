@@ -4,7 +4,7 @@ pub struct Tower {
 }
 
 impl Tower {
-    pub fn new(path: Vec<(f32, f32)>) -> Self {
+    pub fn new() -> Self {
         Self {
             position: (0.0, 0.0),
             health: 100,

@@ -6,6 +6,7 @@ mod tower;
 
 use assets::Assets;
 use enemy::Enemy;
+
 use sdl2::image::LoadSurface;
 use sdl2::pixels::PixelFormatEnum;
 use sdl2::surface::Surface;
@@ -71,9 +72,8 @@ pub fn main() -> Result<(), String> {
     let button_y = (WINDOW_HEIGHT as i32 / 2 - total_buttons_height / 2) as i32;
 
     // Create buttons
-    let start_game_button = ui::Button::new("start_game", button_x, button_y, button_width as u32, button_height as u32, &assets.start_button);
-    let close_game_button = ui::Button::new("close_game", button_x, button_y + button_height, button_width as u32, button_height as u32, &assets.close_button);
-
+    let start_game_button = ui::Button::new(button_x, button_y, button_width as u32, button_height as u32, &assets.start_button);
+    let close_game_button = ui::Button::new(button_x, button_y + button_height, button_width as u32, button_height as u32, &assets.close_button);
 
     // Clear the canvas and update new renders
     canvas.clear();
@@ -85,22 +85,29 @@ pub fn main() -> Result<(), String> {
     // game state
     // 0 = Menu
     // 1 = Game
+    #[derive(PartialEq)]
+    enum GameState {
+        Menu,
+        Game,
+    }
+
     pub struct GamePanel {
-        pub game_state: u32,
+        pub game_state: GameState,
         pub tower_positions: Vec<Rect>, 
     }
 
     let mut game_panel = GamePanel {
-        game_state: 0,
+        game_state: GameState::Menu,
         tower_positions: Vec::new(),
     };
 
-    game_panel.game_state = 0;
-    // creating Enemy
-    let mut enemy = Enemy::create_enemy();
+    game_panel.game_state = GameState::Menu;
 
     // List of tower positions
     game_panel.tower_positions = Vec::new();
+
+    // creating Enemy
+    let mut enemy = Enemy::create_enemy();
 
     // Load the path as surface to check for collision
     // Converting to RGBA to check for transparency
@@ -116,19 +123,19 @@ pub fn main() -> Result<(), String> {
                     break 'running;
                 },
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                    game_panel.game_state = 0;
+                    game_panel.game_state = GameState::Menu;
                 },
 
                 // Track mouse coordinates on click
                 Event::MouseButtonDown { x, y, mouse_btn: MouseButton::Left, .. } => {
-                    if game_panel.game_state == 0 {
+                    if game_panel.game_state == GameState::Menu {
                         // DEBUG
                         println!("mouse btn down at ({},{})", x, y);
 
                         // Check if the mouse is over the button
                         if start_game_button.is_hovered(x, y) {
                             println!("Button 1 clicked");
-                            game_panel.game_state = 1;
+                            game_panel.game_state = GameState::Game;
                         } else if close_game_button.is_hovered(x, y) {
                             println!("Button 2 clicked");
                             break 'running;
@@ -155,7 +162,7 @@ pub fn main() -> Result<(), String> {
         // W = Up
         if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::W) {
             man_dest_rect.set_y(man_dest_rect.y() - 2);
-            game_panel.game_state = 1;
+            game_panel.game_state = GameState::Game;
         }
         // S = Down
         if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::S) {
@@ -172,7 +179,8 @@ pub fn main() -> Result<(), String> {
 
         // Render depending on the game state
         // Game State 1 = Game
-        if game_panel.game_state == 1 {
+        if game_panel.game_state == GameState::Game {
+
             if !enemy.finished {
                 enemy.update();
                 enemy_dest_rect.set_x(enemy.position.0 as i32);
@@ -185,10 +193,6 @@ pub fn main() -> Result<(), String> {
                     let dest_rect = Rect::new((i * SPRITE_SIZE) as i32, (j * SPRITE_SIZE) as i32, SPRITE_SIZE, SPRITE_SIZE);
                     canvas.copy(&assets.grass, None, Some(dest_rect)).expect("Failed to copy grass texture");
                 }
-                // Render rest of the textures in Order
-                canvas.copy(&assets.fluss, None, Some(fluss_dest_rect)).expect("Failed to copy tower texture");
-                canvas.copy(&assets.tower, None, Some(tower1_dest_rect)).expect("Failed to copy tower texture");
-                canvas.copy(&assets.man, None, Some(man_dest_rect)).expect("Failed to copy man texture");
             }
 
             // Render rest of the textures in Order
