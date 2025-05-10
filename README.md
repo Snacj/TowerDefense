@@ -108,11 +108,6 @@ assets/
 
 ---
 
-## 🙌 Contributing
-
-Pull requests are welcome! Please open an issue first for any big changes or suggestions.
-
----
 
 ## 📜 License
 
