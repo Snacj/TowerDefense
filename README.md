@@ -26,7 +26,7 @@ _A 2D pixel-art tower defense game built with Rust and SDL2._
 ### Clone and Run
 
 ```bash
-git clone https://github.com/Snacj/rusty-defense.git
+git clone https://github.com/Snacj/TowerDefense.git
 cd rusty-defense
 cargo run
 ```
@@ -55,7 +55,7 @@ assets/
 
 - [x] Game loop with SDL2 window
 - [x] Tile-based map rendering
-- [ ] Placeable towers
+- [x] Placeable towers
 - [ ] Enemy waves with pathfinding
 - [ ] Tower attack logic (range, damage, fire rate)
 - [ ] Upgrade system for towers
