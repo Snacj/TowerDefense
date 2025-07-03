@@ -241,7 +241,6 @@ fn can_place_tower(surface: &Surface, x: i32, y: i32) -> bool {
             }
         }
     }
-
     true
 }
 
